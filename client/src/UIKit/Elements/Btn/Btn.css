@@ -1,0 +1,19 @@
+.Btn {
+    background-color: #90b4d8;
+    color: rgb(37, 37, 37);
+    border: 1px solid #90b4d8;
+    padding: 15px 20px;
+    width: fit-content;
+    border-radius: 10px;
+    margin-left: 35%;
+    opacity: 0.8;
+}
+
+.Btn:hover {
+    opacity: 1;
+    cursor: pointer;
+}
+
+.Btn:active {
+    opacity: 0.9;
+}

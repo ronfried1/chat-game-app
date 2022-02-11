@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "baseUrl": "src"
+    },
+    "include": [
+        "src"
+, "src/UIKit", "../project_docs/roy.js"    ],
+    "exclude": ["node_modules"] 
+}
