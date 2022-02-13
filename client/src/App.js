@@ -21,7 +21,7 @@ const App = () => {
   const [currentChat, setCurrentChat] = useState({
     isChannel: true,
     chatName: "general",
-    reciverId: "",
+    receiverId: "",
   });
   const [connectedRooms, setConnectedRooms] = useState(["general"]);
   const [allUsers, setAllUsers] = useState([]);
@@ -40,7 +40,7 @@ const App = () => {
   function sendMessage() {
     const payload = {
       content: message,
-      to: currentChat.isChannel ? currentChat.chatName : currentChat.reciverId,
+      to: currentChat.isChannel ? currentChat.chatName : currentChat.receiverId,
       sender: username,
       chatName: currentChat.chatName,
       isChannel: currentChat.isChannel,

@@ -40,11 +40,16 @@ io.on("connection", (socket) => {
   console.log("connection");
   socket.on("join server", (username) => {
     console.log("join server");
-    const user = {
+    const onlineUser = {
       username,
       id: socket.id,
     };
-    onlineUsers.push(user);
+// LogedUsers.map((user =>{
+//   if(user === onlineUser.username){
+//     [...user, isOnline: true]
+//   }
+// }))
+    onlineUsers.push(onlineUser);
     console.log(onlineUsers);
     io.emit("new user", onlineUsers);
   });
@@ -56,27 +61,26 @@ io.on("connection", (socket) => {
     // socket.emit("joined", messages[roomName]);
   });
 
-  socket.on("send message", ({ contant, to, sender, chatName, isChannel }) => {
+  socket.on("send message", ({ content, to, sender, chatName, isChannel }) => {
     if (isChannel) {
       const payload = {
-        contant,
+        content,
         chatName,
         sender,
       };
       socket.to(to).emit("new message", payload);
+    } else {
+      const payload = {
+        content,
+        chatName: sender,
+        sender,
+      };
+      socket.to(to).emit("new message", payload);
     }
-    //this is what i need
-    const payload = {
-      contant,
-      chatName: sender,
-      sender,
-    };
-    socket.to(to).emit("new message", payload);
-
     if (messages[chatName]) {
       messages[chatName].push({
         sender,
-        contant,
+        content,
       });
     }
   });
@@ -86,7 +90,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    onlineUsers=  onlineUsers.filter((u) => u.id !== socket.id);
+    onlineUsers = onlineUsers.filter((u) => u.id !== socket.id);
     io.emit("new user", onlineUsers);
   });
 });
@@ -102,12 +106,15 @@ const PORT = process.env.PORT || 5000;
 mongoose
   .connect(CONNECTION_URL)
   .then(console.log("conected to DB"))
+  .then(
+    server.listen(PORT, function () {
+      console.log(`listening on port ${PORT} with server socket io`);
+    })
+  )
   .then(getAllUsers(), (res) => {
     console.log(res);
+    LogedUsers = res;
   })
   .catch((error) => console.log(`${error} did not connect`));
 
-server.listen(PORT, function () {
-  console.log(`listening on port ${PORT} with server socket io`);
-});
 // app.listen(PORT, () => console.log(`Server Running on Port: http://localhost:${PORT}`))

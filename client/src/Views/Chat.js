@@ -69,7 +69,6 @@ export default function Chat(props) {
     return (
       <ListItem key={index}>
         <ListItemText primary={message.sender} secondary={message.content} />
-        <ListItemText primary={message.content} />
       </ListItem>
     );
   };
@@ -146,38 +145,43 @@ export default function Chat(props) {
             <Divider />
             <List>{props.allUsers.map(renderUser)}</List>
           </Drawer>
-          <Grid xs={12} item>
-            <Box
-              component="main"
-              sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
-            >
-              <Toolbar />
-              <Typography paragraph>{props.currentChat.chatname}</Typography>
-              <div>{body} </div>
-              {/* <Typography paragraph>{body}</Typography> */}
+          <Paper
+            component="main"
+            sx={{ flexGrow: 1, p: 3 }}
+            id="paper"
+            elevation={5}
+          >
+            <Box id="box" p={3}>
+              <Toolbar>{props.currentChat.chatName}</Toolbar>
+              <Divider />
+              <Grid container spacing={4} alignItems="center">
+                <Grid xs={12} item>
+                  {body}{" "}
+                </Grid>
+                <Grid xs={10} item>
+                  <FormControl fullWidth>
+                    <TextField
+                      value={props.message}
+                      name="message"
+                      label="Type your Message..."
+                      onChange={props.handleMessageChange}
+                      variant="outlined"
+                      onKeyPress={handleKeyPress}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid xs={2} item>
+                  <IconButton
+                    onClick={props.sendMessage}
+                    aria-label="send"
+                    color="primary"
+                  >
+                    <SendIcon />
+                  </IconButton>
+                </Grid>
+              </Grid>
             </Box>
-          </Grid>
-          <Grid xs={9} item>
-            <FormControl fullWidth>
-              <TextField
-                value={props.message}
-                name="message"
-                label="Type your Message..."
-                onChange={props.handleMessageChange}
-                variant="outlined"
-                onKeyPress={handleKeyPress}
-              />
-            </FormControl>
-          </Grid>
-          <Grid xs={1} item>
-            <IconButton
-              onClick={props.sendMessage}
-              aria-label="send"
-              color="primary"
-            >
-              <SendIcon />
-            </IconButton>
-          </Grid>
+          </Paper>
         </Box>
       </Container>
     </Fragment>

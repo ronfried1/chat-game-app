@@ -16,10 +16,8 @@ import {
   Typography,
 } from "@mui/material";
 import { createUser, loginUser } from "api";
-import { useNavigate } from "react-router-dom";
 import AppContext from "Store";
 
-import { getIdSocket } from "Socket/socketRef";
 
 const userNameReducer = (state, action) => {
   if (action.type === "USER_INPUT") {
@@ -119,7 +117,7 @@ const Login = (props) => {
     margin: "20px auto",
   };
 
-  const [value, setValue] = useState(1);
+  const [value, setValue] = useState(0);
   const onTabChange = (event, newValue) => {
     setValue(newValue);
   };
