@@ -21,11 +21,9 @@ import {
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 
-const rooms = [];
-
+const rooms = ["general", "random", "jokes", "javascript"];
 
 export default function Chat(props) {
-    
   function renderRooms(room) {
     const currentChat = {
       chatName: room,
@@ -67,12 +65,20 @@ export default function Chat(props) {
     }
   }
 
+  const renderMessages = (message, index) => {
+    return (
+      <ListItem key={index}>
+        <ListItemText primary={message.sender} secondary={message.content} />
+        <ListItemText primary={message.content} />
+      </ListItem>
+    );
+  };
   let body;
   if (
     !props.currentChat.isChannel ||
     props.connectedRooms.includes(props.currentChat.chatName)
   ) {
-    body = (<List>{props.messages.map(renderMessages)}</List>);
+    body = <List>{props.messages.map(renderMessages)}</List>;
   } else {
     body = (
       <Button
@@ -82,15 +88,6 @@ export default function Chat(props) {
       >
         Join {props.currentChat.chatName}
       </Button>
-    );
-  }
-
-  const renderMessages = (message, index) => {
-    return (
-      <div key={index}>
-        <h3>{message.sender}</h3>
-        <p>{message.content}</p>
-      </div>
     );
 
     // return chat.map((message, index) => {
@@ -107,7 +104,7 @@ export default function Chat(props) {
     //     </ListItem>
     //   );
     // });
-  };
+  }
 
   return (
     <Fragment>
@@ -120,6 +117,7 @@ export default function Chat(props) {
             sx={{
               width: `calc(100% - ${240}px)`,
               ml: `${240}px`,
+              bgcolor: "transparent",
             }}
           >
             <Toolbar>
@@ -144,27 +142,28 @@ export default function Chat(props) {
             <div>Channels</div>
             <Divider />
             <List>{rooms.map(renderRooms)}</List>
-            <List>
-              <div>Users</div>
-              <Divider />
-              {props.allUsers.map(renderUser)}
-            </List>
+            <div>Users</div>
+            <Divider />
+            <List>{props.allUsers.map(renderUser)}</List>
           </Drawer>
-          <Box
-            component="main"
-            sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
-          >
-            <Toolbar />
-            <Typography paragraph>{props.currentChat.chatname}</Typography>
-            <Typography paragraph>{body}</Typography>
-          </Box>
+          <Grid xs={12} item>
+            <Box
+              component="main"
+              sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
+            >
+              <Toolbar />
+              <Typography paragraph>{props.currentChat.chatname}</Typography>
+              <div>{body} </div>
+              {/* <Typography paragraph>{body}</Typography> */}
+            </Box>
+          </Grid>
           <Grid xs={9} item>
             <FormControl fullWidth>
               <TextField
+                value={props.message}
                 name="message"
                 label="Type your Message..."
                 onChange={props.handleMessageChange}
-                value={props.message}
                 variant="outlined"
                 onKeyPress={handleKeyPress}
               />

@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { Between, Grid, Icon, Line } from "UIKit";
 import Login from "./Views/Login";
-import Lobby from "./Views/Lobby";
 import AppContext from "Store";
 import { io } from "socket.io-client";
 import "./App.css";
@@ -20,11 +19,11 @@ const App = () => {
   const [username, setusername] = useState("");
   const [connected, setConnected] = useState(false);
   const [currentChat, setCurrentChat] = useState({
-    isChannel: false,
+    isChannel: true,
     chatName: "general",
     reciverId: "",
   });
-  const [connectedRooms, setConnectedRooms] = useState([]);
+  const [connectedRooms, setConnectedRooms] = useState(["general"]);
   const [allUsers, setAllUsers] = useState([]);
   const [messages, setMessages] = useState(initialMessagesState);
   const [message, setMessage] = useState("");
@@ -34,9 +33,9 @@ const App = () => {
     setMessage(e.target.value);
   }
 
-useEffect(()=>{
-  setMessages("");
-},[messages]);
+  useEffect(() => {
+    setMessage("");
+  }, [messages]);
 
   function sendMessage() {
     const payload = {
@@ -81,6 +80,8 @@ useEffect(()=>{
     setConnectedRooms(newConnectedRooms);
   }
 
+  //get the right chat messages.
+  //if there's no chat, it creats ne array in the messageschat list
   function toggleChat(currentChat) {
     if (!messages[currentChat.chatName]) {
       //immer
@@ -99,14 +100,28 @@ useEffect(()=>{
   }
 
   function connect() {
+    console.log("connecting");
     setConnected(true);
-    socketRef.current = io.connect("/");
+    socketRef.current = io.connect("http://localhost:5000");
     socketRef.current.emit("join server", username);
     socketRef.current.emit("join room", "general", (messages) =>
       roomJoinCallback(messages, "general")
     );
+
+    //NO DATA RENDER
+    socketRef.current.on("connect", () => {
+      console.log("socket connected");
+    });
+    socketRef.current.on("disconnect", () => {
+      console.log("socket disconnect");
+    });
+    socketRef.current.on("connect_error", (connect_error) => {
+      console.log("socket connect_error", connect_error);
+    });
+
     socketRef.current.on("new user", (allUsers) => {
       setAllUsers(allUsers);
+      console.log(allUsers);
     });
     socketRef.current.on("new message", ({ content, sender, chatName }) => {
       setMessages((messages) => {
@@ -123,6 +138,27 @@ useEffect(()=>{
     });
   }
 
+  let body;
+  if (connected) {
+    body = (
+      <Chat
+        message={message}
+        handleMessageChange={handleMessageChange}
+        sendMessage={sendMessage}
+        yourId={socketRef.current ? socketRef.current.id : ""}
+        allUsers={allUsers}
+        joinRoom={joinRoom}
+        connectedRooms={connectedRooms}
+        currentChat={currentChat}
+        toggleChat={toggleChat}
+        messages={messages[currentChat.chatName]}
+      />
+    );
+  } else {
+    body = (
+      <Login username={username} onChange={handleChange} connect={connect} />
+    );
+  }
   return (
     <React.Fragment>
       <div className="App">
@@ -137,21 +173,7 @@ useEffect(()=>{
               </Line>
             </Between>
           </div>
-          <div>
-            {!connected && <Login username={username} onChange={handleChange} connect={connect} />}
-            {/* {connected && <Lobby  />} */}
-            {connected && <Chat message={message}
-            handleMessageChange={handleMessageChange}
-            sendMessage={sendMessage}
-            yourId={socketRef.current? socketRef.current.id : ""}
-            allUsers={allUsers}
-            joinRoom={joinRoom}
-            connectedRooms={connectedRooms}
-            currentChat={currentChat}
-            toggleChat={toggleChat}
-            messages={messages[currentChat.chatName]}
-            />}
-          </div>
+          <div>{body}</div>
         </Grid>
       </div>
     </React.Fragment>

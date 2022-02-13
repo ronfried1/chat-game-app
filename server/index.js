@@ -27,6 +27,7 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 
 let LogedUsers = getAllUsers();
+console.log({ LogedUsers });
 let onlineUsers = [];
 const messages = {
   general: [],
@@ -36,13 +37,15 @@ const messages = {
 };
 //a user connected...
 io.on("connection", (socket) => {
+  console.log("connection");
   socket.on("join server", (username) => {
+    console.log("join server");
     const user = {
       username,
       id: socket.id,
     };
     onlineUsers.push(user);
-    //need to biuld in client
+    console.log(onlineUsers);
     io.emit("new user", onlineUsers);
   });
 
@@ -50,11 +53,11 @@ io.on("connection", (socket) => {
   socket.on("join room", (roomName, cb) => {
     socket.join(roomName);
     cb(messages[roomName]);
-    // socket.emit("joined", messages[roomName]); 
+    // socket.emit("joined", messages[roomName]);
   });
 
   socket.on("send message", ({ contant, to, sender, chatName, isChannel }) => {
-    if(isChannel){
+    if (isChannel) {
       const payload = {
         contant,
         chatName,
@@ -62,35 +65,31 @@ io.on("connection", (socket) => {
       };
       socket.to(to).emit("new message", payload);
     }
-   //this is what i need
-      const payload = {
-        contant,
-        chatName: sender,
-        sender,
-      };
-      socket.to(to).emit("new message", payload);
-    
+    //this is what i need
+    const payload = {
+      contant,
+      chatName: sender,
+      sender,
+    };
+    socket.to(to).emit("new message", payload);
+
     if (messages[chatName]) {
       messages[chatName].push({
         sender,
-        contant
+        contant,
       });
     }
   });
 
-  socket.on("send message old", body => {
-    io.emit("message", body)
-})
-
-  socket.on("disconnect", () => {
-    onlineUsers.filter((u) =>  u.id !== socket.id);
-    io.emit("new user", onlineUsers)
-    });
-
+  socket.on("send message old", (body) => {
+    io.emit("message", body);
   });
 
-  
-
+  socket.on("disconnect", () => {
+    onlineUsers=  onlineUsers.filter((u) => u.id !== socket.id);
+    io.emit("new user", onlineUsers);
+  });
+});
 
 app.use("/posts", postRoutes);
 app.use("/users", userRoutes);
@@ -103,6 +102,9 @@ const PORT = process.env.PORT || 5000;
 mongoose
   .connect(CONNECTION_URL)
   .then(console.log("conected to DB"))
+  .then(getAllUsers(), (res) => {
+    console.log(res);
+  })
   .catch((error) => console.log(`${error} did not connect`));
 
 server.listen(PORT, function () {

@@ -19,7 +19,6 @@ import { createUser, loginUser } from "api";
 import { useNavigate } from "react-router-dom";
 import AppContext from "Store";
 
-import "./Login.css";
 import { getIdSocket } from "Socket/socketRef";
 
 const userNameReducer = (state, action) => {
@@ -114,16 +113,16 @@ const Login = (props) => {
 
   const paperStyle = {
     padding: 20,
-    paddinTop:0,
+    paddinTop: 0,
     height: "70vh",
     width: 280,
     margin: "20px auto",
   };
 
- const [value, setValue] = useState(2);
-const onTabChange = (event, newValue)=>{
-  setValue(newValue)
-}
+  const [value, setValue] = useState(1);
+  const onTabChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   return (
     <Grid container className="Login" style={{ marginTop: "100px" }}>
@@ -141,10 +140,9 @@ const onTabChange = (event, newValue)=>{
             textColor="primary"
             onChange={onTabChange}
             aria-label="disabled tabs example"
-            fullWidth
-          >     
-            <Tab label="Log In"  onClick={() => setSignin(true)} />
-            <Tab label="Sign Up" onClick={() => setSignin(false)}/>
+          >
+            <Tab label="Log In" onClick={() => setSignin(true)} />
+            <Tab label="Sign Up" onClick={() => setSignin(false)} />
           </Tabs>
         </Grid>
         <Grid marginTop="40px">
@@ -154,7 +152,6 @@ const onTabChange = (event, newValue)=>{
               ref={userNameInputRef}
               label="Username"
               placeholder="Enter username"
-              isValid={userNameIsValid}
               value={userNameState.value}
               onChange={userNameChangeHandler}
               fullWidth
@@ -166,7 +163,6 @@ const onTabChange = (event, newValue)=>{
               label="Password"
               placeholder="Enter password"
               type="password"
-              isValid={passwordIsValid}
               value={passwordState.value}
               onChange={passwordChangeHandler}
               fullWidth
