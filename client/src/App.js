@@ -45,6 +45,7 @@ const App = () => {
       chatName: currentChat.chatName,
       isChannel: currentChat.isChannel,
     };
+    
     socketRef.current.emit("send message", payload);
     //immer
     const newMessages = immer(messages, (draft) => {
