@@ -18,84 +18,71 @@ const io = new Server(server, {
 // require ('dotenv/config');
 
 // IMPORT ROUTES
-import postRoutes from "./routes/posts.js";
+
 import userRoutes from "./routes/users.js";
 import { getAllUsers } from "./controllers/users.js";
+import { getMessagesBetween, createMessage } from "./controllers/messages.js";
 
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 
-let LogedUsers = getAllUsers();
-console.log({ LogedUsers });
-let onlineUsers = [];
+let LogedUsers = [];
+
 const messages = {
   general: [],
   random: [],
-  jokes: [],
-  javascript: [],
 };
 //a user connected...
 io.on("connection", (socket) => {
+  let currentUsername = null;
   console.log("connection");
+
   socket.on("join server", (username) => {
-    console.log("join server");
-    const onlineUser = {
-      username,
-      id: socket.id,
-    };
-// LogedUsers.map((user =>{
-//   if(user === onlineUser.username){
-//     [...user, isOnline: true]
-//   }
-// }))
-    onlineUsers.push(onlineUser);
-    console.log(onlineUsers);
-    io.emit("new user", onlineUsers);
+    currentUsername = username;
+    console.log("join server : ", username);
+    LogedUsers.forEach((user) => {
+      if (user.userName === username) {
+        user.isOnline = true;
+        user.socketId = socket.id;
+      }
+    });
+    console.log({ LogedUsers });
+    io.emit("new user", LogedUsers);
   });
 
-  //need to biuld in client
-  socket.on("join room", (roomName, cb) => {
-    socket.join(roomName);
-    cb(messages[roomName]);
+  socket.on("join room", async (roomName, cb) => {
+    const messagesBetween = await getMessagesBetween(currentUsername, roomName);
+    console.log(messagesBetween);
+    cb(messagesBetween);
     // socket.emit("joined", messages[roomName]);
   });
 
-  socket.on("send message", ({ content, to, sender, chatName, isChannel }) => {
-    if (isChannel) {
-      const payload = {
-        content,
-        chatName,
-        sender,
-      };
-      socket.to(to).emit("new message", payload);
-    } else {
-      const payload = {
-        content,
-        chatName: sender,
-        sender,
-      };
-      socket.to(to).emit("new message", payload);
-    }
-    if (messages[chatName]) {
-      messages[chatName].push({
-        sender,
-        content,
-      });
-    }
-  });
+  socket.on("send message", async ({ content, to, sender }) => {
+    const payload = await createMessage(content, to, sender);
+    console.log({ payload });
+    socket.to(to).emit("new message", payload);
 
-  socket.on("send message old", (body) => {
-    io.emit("message", body);
+    // if (messages[chatName]) {
+    //   messages[chatName].push({
+    //     sender,
+    //     content,
+    //   });
+    // }
   });
 
   socket.on("disconnect", () => {
-    onlineUsers = onlineUsers.filter((u) => u.id !== socket.id);
-    io.emit("new user", onlineUsers);
+    //onlineUsers = onlineUsers.filter((u) => u.id !== socket.id);
+    LogedUsers.forEach((user) => {
+      if (user.socketId === socket.id) {
+        user.isOnline = false;
+        user.socketId = "";
+      }
+    });
+    io.emit("new user", LogedUsers);
   });
 });
 
-app.use("/posts", postRoutes);
 app.use("/users", userRoutes);
 
 //CONNECT TO DB
@@ -105,15 +92,21 @@ const PORT = process.env.PORT || 5000;
 
 mongoose
   .connect(CONNECTION_URL)
-  .then(console.log("conected to DB"))
-  .then(
+  .then(() => console.log("conected to DB"))
+  .then(() => {
     server.listen(PORT, function () {
       console.log(`listening on port ${PORT} with server socket io`);
-    })
-  )
-  .then(getAllUsers(), (res) => {
-    console.log(res);
-    LogedUsers = res;
+    });
+  })
+  .then(() => getAllUsers())
+  .then((users) => {
+    console.log({ users });
+    users.forEach((user) => {
+      user.isOnline = false;
+      user.socketId = "";
+    });
+    console.log({ users });
+    LogedUsers = users;
   })
   .catch((error) => console.log(`${error} did not connect`));
 

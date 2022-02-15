@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import { createUser, loginUser } from "api";
 import AppContext from "Store";
-
+import { SocketContext } from "../context/socketContext";
 
 const userNameReducer = (state, action) => {
   if (action.type === "USER_INPUT") {
@@ -40,6 +40,12 @@ const passwordReducer = (state, action) => {
 };
 
 const Login = (props) => {
+  // username={username}
+  // onChange={handleChange} ...onUsernameChange
+  // connect={connect}
+
+  const socket = useContext(SocketContext);
+
   const [signin, setSignin] = useState(true);
 
   const [formIsValid, setFormIsValid] = useState(false);
@@ -75,7 +81,7 @@ const Login = (props) => {
 
   const userNameChangeHandler = (event) => {
     dispatchUserName({ type: "USER_INPUT", val: event.target.value });
-    props.onChange(event);
+    socket.onUsernameChange(event);
   };
   const passwordChangeHandler = (event) => {
     dispatchPassword({ type: "USER_INPUT", val: event.target.value });
@@ -92,7 +98,7 @@ const Login = (props) => {
           if (user) {
             // ctx.onLogin((user.data.user.userName));
             //get socket conect
-            props.connect();
+            socket.connect();
           }
         });
       } else {
@@ -102,7 +108,7 @@ const Login = (props) => {
         }).then((user) => {
           if (user) {
             // ctx.onLogin();
-            props.connect();
+            socket.connect();
           }
         });
       }

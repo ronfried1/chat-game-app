@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useContext, useEffect } from "react";
 import {
   AppBar,
   Box,
@@ -20,48 +20,41 @@ import {
   Typography,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import SocketContext from "../context/socketContext";
 
-const rooms = ["general", "random", "jokes", "javascript"];
+const rooms = ["general", "random"];
 
 export default function Chat(props) {
-  function renderRooms(room) {
-    const currentChat = {
-      chatName: room,
-      isChannel: true,
-      receiverId: "",
-    };
-    return (
-      <ListItem button key={room} onClick={() => props.toggleChat(currentChat)}>
-        <ListItemText primary={room} />
-      </ListItem>
-    );
-  }
+  const socket = useContext(SocketContext);
+
+  useEffect(() => {
+    socket.connect();
+
+    return () => {};
+  }, []);
+
   function renderUser(user) {
-    if (user.id === props.yourId) {
+    if (user.socketId === socket.yourId) {
       return (
-        <ListItem key={user.id}>
-          <ListItemText primary={`You: ${user.username}`} />
+        <ListItem key={user.socketId}>
+          <ListItemText primary={`You: ${user.userName}`} />
         </ListItem>
       );
     }
-    const currentChat = {
-      chatName: user.username,
-      isChannel: false,
-      receiverId: user.id,
-    };
+
     return (
       <ListItem
         button
-        key={user.id}
-        onClick={() => props.toggleChat(currentChat)}
+        key={user.userName}
+        onClick={() => socket.joinRoom(user.userName)}
       >
-        <ListItemText primary={user.username} />
+        <ListItemText primary={user.userName + " " + user.isOnline} />
       </ListItem>
     );
   }
   function handleKeyPress(e) {
     if (e.key === "Enter") {
-      props.sendMessage();
+      socket.sendMessage();
     }
   }
 
@@ -73,36 +66,12 @@ export default function Chat(props) {
     );
   };
   let body;
-  if (
-    !props.currentChat.isChannel ||
-    props.connectedRooms.includes(props.currentChat.chatName)
-  ) {
-    body = <List>{props.messages.map(renderMessages)}</List>;
-  } else {
+  if (socket.currentChat && socket.messages[socket.currentChat]) {
     body = (
-      <Button
-        onClick={() => {
-          props.joinRoom(props.currentChat.chatName);
-        }}
-      >
-        Join {props.currentChat.chatName}
-      </Button>
+      <List>{socket.messages[socket.currentChat].map(renderMessages)}</List>
     );
-
-    // return chat.map((message, index) => {
-    //   if (message.id === yourID) {
-    //     return (
-    //       <ListItem key={index}>
-    //         <ListItemText primary={message.body} />
-    //       </ListItem>
-    //     );
-    //   }
-    //   return (
-    //     <ListItem key={index}>
-    //       <ListItemText primary={message.body} />
-    //     </ListItem>
-    //   );
-    // });
+  } else {
+    body = <List></List>;
   }
 
   return (
@@ -138,12 +107,9 @@ export default function Chat(props) {
             anchor="left"
           >
             <Toolbar />
-            <div>Channels</div>
-            <Divider />
-            <List>{rooms.map(renderRooms)}</List>
             <div>Users</div>
             <Divider />
-            <List>{props.allUsers.map(renderUser)}</List>
+            <List>{socket.allUsers.map(renderUser)}</List>
           </Drawer>
           <Paper
             component="main"
@@ -152,7 +118,7 @@ export default function Chat(props) {
             elevation={5}
           >
             <Box id="box" p={3}>
-              <Toolbar>{props.currentChat.chatName}</Toolbar>
+              <Toolbar>{socket.currentChat || "no chat"}</Toolbar>
               <Divider />
               <Grid container spacing={4} alignItems="center">
                 <Grid xs={12} item>
@@ -161,10 +127,10 @@ export default function Chat(props) {
                 <Grid xs={10} item>
                   <FormControl fullWidth>
                     <TextField
-                      value={props.message}
+                      value={socket.message}
                       name="message"
                       label="Type your Message..."
-                      onChange={props.handleMessageChange}
+                      onChange={socket.handleMessageChange}
                       variant="outlined"
                       onKeyPress={handleKeyPress}
                     />
@@ -172,7 +138,7 @@ export default function Chat(props) {
                 </Grid>
                 <Grid xs={2} item>
                   <IconButton
-                    onClick={props.sendMessage}
+                    onClick={socket.sendMessage}
                     aria-label="send"
                     color="primary"
                   >

@@ -3,10 +3,25 @@ import User from "../models/user.js";
 export const getUserByUserName = async (req, res) => {
   const { userName, userPassword } = req.body;
   //add try catch
-  User.findOne({ userName, userPassword }, (err, obj) => {
-    res.send({
-      user: obj,
-    });
+  // User.findOne({ userName, userPassword }, (err, obj) => {
+  User.findOne({ userName }, (err, obj) => {
+    if (err) {
+      res.status(404).json({ message: "can't log in" });
+      return;
+    }
+
+    if (obj == null) {
+      res.status(404).json({ message: "can't log in" });
+      return;
+    }
+
+    if (userPassword === obj.userPassword) {
+      res.send({
+        user: obj,
+      });
+    } else {
+      res.status(404).json({ message: "can't log in" });
+    }
   });
 };
 
@@ -21,13 +36,34 @@ export const createUser = async (req, res) => {
   }
 };
 
-export const getAllUsers = async () => {
-  try {
-    const results = await User.find({});
-    const allUsers = results.map((user) => user.userName);
-    return allUsers;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-};
+export function getAllUsers() {
+  return new Promise((resolve, reject) => {
+    User.find({})
+      .then((result) => {
+        resolve(
+          result.map((user) => ({
+            userName: user.userName,
+            userPassword: user.userPassword,
+            _id: user._id,
+          }))
+        );
+      })
+      .catch((err) => reject(err));
+  });
+}
+
+// export const getAllUsers = async () => {
+//   try {
+//     const results = await User.find({});
+//     const allUsers = results.map((user) => {
+//       {
+//         user.userName;
+//       }
+//     });
+
+//     return allUsers;
+//   } catch (error) {
+//     console.log(error);
+//     return null;
+//   }
+// };
