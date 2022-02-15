@@ -56,8 +56,8 @@ io.on("connection", (socket) => {
     cb(messagesBetween, roomName);
   });
 
-  socket.on("send message", async ({ messageContent, userReciver, userSender }) => {
-    const payload = await createMessage(messageContent, userReciver, userSender);
+  socket.on("send message", async ({ messageContent, userReciver, userSender, createdAt }) => {
+    const payload = await createMessage(messageContent, userReciver, userSender,createdAt );
     console.log({ payload });
     const to = LogedUsers.find(u => u.userName === userReciver)
     console.log(to.socketId, to);

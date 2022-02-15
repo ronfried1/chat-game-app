@@ -26,11 +26,12 @@ export const getMessagesBetween = async (user1, user2) => {
   });
 };
 
-export const createMessage = async (content, to, sender) => {
+export const createMessage = async (content, to, sender, time) => {
   const message = new Message({
     messageContent: content,
     userSender: sender,
     userReciver: to,
+    createdAt: time
   });
   try {
     return await message.save();

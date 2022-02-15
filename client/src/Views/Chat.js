@@ -59,10 +59,14 @@ export default function Chat(props) {
   }
 
   const renderMessages = (message, index) => {
+    const month = message.createdAt.toLocaleString();
+    // const day = message.createdAt.toLocaleString("en-US", { day: "2-digit" });
+    // const year = message.createdAt.toLocaleString();
+
     return (
       <ListItem key={index}>
         <ListItemText primary={message.userSender} secondary={message.messageContent} />
-        <ListItemText secondary={message.createdAt} />
+        <ListItemText secondary={month+"/"} />
       </ListItem>
     );
   };

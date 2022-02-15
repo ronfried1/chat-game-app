@@ -37,15 +37,13 @@ export const SocketContextProvider = (props) => {
       messageContent: message,
       userReciver: currentChat,
       userSender: username,
+      createdAt: new Date()
     };
 
     socketRef.current.emit("send message", payload);
     //immer
     const newMessages = immer(messages, (draft) => {
-      draft[currentChat].push({
-        userSender: username,
-        messageContent: message,
-      });
+      draft[currentChat].push(payload);
     });
     // const newMessages = [...messages, {sender: username, content: message}];
     setMessages(newMessages);
@@ -103,9 +101,9 @@ export const SocketContextProvider = (props) => {
           console.log(messages, "this is messages");
           const newMessages = immer(messages, (draft) => {
             if (draft[userSender]) {
-              draft[userSender].push({ messageContent, userSender });
+              draft[userSender].push({ messageContent, userSender, createdAt });
             } else {
-              draft[userSender] = [{ messageContent, userSender }];
+              draft[userSender] = [{ messageContent, userSender, createdAt }];
             }
           });
           return newMessages;
