@@ -34,27 +34,26 @@ export const SocketContextProvider = (props) => {
 
   function sendMessage() {
     const payload = {
-      content: message,
-      to: currentChat,
-      sender: username,
+      messageContent: message,
+      userReciver: currentChat,
+      userSender: username,
     };
 
     socketRef.current.emit("send message", payload);
     //immer
     const newMessages = immer(messages, (draft) => {
       draft[currentChat].push({
-        sender: username,
-        content: message,
-        // time: Date.now(),
+        userSender: username,
+        messageContent: message,
       });
     });
     // const newMessages = [...messages, {sender: username, content: message}];
     setMessages(newMessages);
   }
 
-  function roomJoinCallback(incomingMessages, chatName) {
+  function roomJoinCallback(incomingMessages, currentChat) {
     const newMessages = immer(messages, (draft) => {
-      draft[chatName] = incomingMessages;
+      draft[currentChat] = incomingMessages;
     });
     setMessages(newMessages);
   }
@@ -69,7 +68,7 @@ export const SocketContextProvider = (props) => {
       socketRef.current.emit(
         "join room",
         currentChat,
-        (messages, currentChat) => roomJoinCallback(messages)
+        (messages) => roomJoinCallback(messages, currentChat)
       );
     }
 
@@ -99,14 +98,14 @@ export const SocketContextProvider = (props) => {
     });
     socketRef.current.on(
       "new message",
-      ({ content, sender, chatName, time }) => {
+      ({ messageContent, userSender, userReciver, createdAt }) => {
         setMessages((messages) => {
           //immer
           const newMessages = immer(messages, (draft) => {
-            if (draft[chatName]) {
-              draft[chatName].push({ content, sender });
+            if (draft[userReciver]) {
+              draft[userReciver].push({ messageContent, userSender });
             } else {
-              draft[chatName] = [{ content, sender }];
+              draft[userReciver] = [{ messageContent, userSender }];
             }
           });
           return newMessages;

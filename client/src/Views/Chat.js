@@ -61,7 +61,7 @@ export default function Chat(props) {
   const renderMessages = (message, index) => {
     return (
       <ListItem key={index}>
-        <ListItemText primary={message.sender} secondary={message.content} />
+        <ListItemText primary={message.userSender} secondary={message.messageContent} />
       </ListItem>
     );
   };
