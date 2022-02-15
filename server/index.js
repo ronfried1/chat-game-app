@@ -53,15 +53,15 @@ io.on("connection", (socket) => {
 
   socket.on("join room", async (roomName, cb) => {
     const messagesBetween = await getMessagesBetween(currentUsername, roomName);
-    console.log(messagesBetween, "the messages between");
     cb(messagesBetween, roomName);
-    // socket.emit("messagesBetween", messages[roomName]);
   });
 
   socket.on("send message", async ({ messageContent, userReciver, userSender }) => {
     const payload = await createMessage(messageContent, userReciver, userSender);
     console.log({ payload });
-    socket.to(payload.userReciver).emit("new message", payload);
+    const to = LogedUsers.find(u => u.userName === userReciver)
+    console.log(to.socketId, to);
+    socket.to(to.socketId).emit("new message", payload);
 
     // if (messages[chatName]) {
     //   messages[chatName].push({

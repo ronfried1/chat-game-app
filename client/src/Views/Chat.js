@@ -62,6 +62,7 @@ export default function Chat(props) {
     return (
       <ListItem key={index}>
         <ListItemText primary={message.userSender} secondary={message.messageContent} />
+        <ListItemText secondary={message.createdAt} />
       </ListItem>
     );
   };

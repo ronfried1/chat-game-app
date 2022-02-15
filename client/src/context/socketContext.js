@@ -100,12 +100,12 @@ export const SocketContextProvider = (props) => {
       "new message",
       ({ messageContent, userSender, userReciver, createdAt }) => {
         setMessages((messages) => {
-          //immer
+          console.log(messages, "this is messages");
           const newMessages = immer(messages, (draft) => {
-            if (draft[userReciver]) {
-              draft[userReciver].push({ messageContent, userSender });
+            if (draft[userSender]) {
+              draft[userSender].push({ messageContent, userSender });
             } else {
-              draft[userReciver] = [{ messageContent, userSender }];
+              draft[userSender] = [{ messageContent, userSender }];
             }
           });
           return newMessages;
