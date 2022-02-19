@@ -16,7 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 import { createUser, loginUser } from "api";
-import AppContext from "Store";
+
 import { SocketContext } from "../context/socketContext";
 
 const userNameReducer = (state, action) => {
@@ -40,15 +40,17 @@ const passwordReducer = (state, action) => {
 };
 
 const Login = (props) => {
-  // username={username}
-  // onChange={handleChange} ...onUsernameChange
-  // connect={connect}
+  const [value, setValue] = useState(0);
 
   const socket = useContext(SocketContext);
 
   const [signin, setSignin] = useState(true);
 
   const [formIsValid, setFormIsValid] = useState(false);
+
+  const onTabChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   const [userNameState, dispatchUserName] = useReducer(userNameReducer, {
     value: "",
@@ -58,8 +60,6 @@ const Login = (props) => {
     value: "",
     isValid: null,
   });
-
-  const ctx = useContext(AppContext);
 
   const userNameInputRef = useRef();
   const passwordInputRef = useRef();
@@ -96,9 +96,7 @@ const Login = (props) => {
           userPassword: passwordState.value,
         }).then((user) => {
           if (user) {
-            // ctx.onLogin((user.data.user.userName));
-            //get socket conect
-            socket.connect();
+            socket.connect();     
           }
         });
       } else {
@@ -107,7 +105,6 @@ const Login = (props) => {
           userPassword: passwordState.value,
         }).then((user) => {
           if (user) {
-            // ctx.onLogin();
             socket.connect();
           }
         });
@@ -123,13 +120,8 @@ const Login = (props) => {
     margin: "20px auto",
   };
 
-  const [value, setValue] = useState(0);
-  const onTabChange = (event, newValue) => {
-    setValue(newValue);
-  };
-
   return (
-    <Grid container className="Login" style={{ marginTop: "100px" }}>
+    <Grid container className="Login" style={{ marginTop: "80px" }}>
       <Paper style={paperStyle} elevation={10}>
         <Grid
           style={{
@@ -184,7 +176,10 @@ const Login = (props) => {
             )}
             {signin && (
               <Button
-                onClick={() => setSignin(false)}
+                onClick={() => {
+                  setSignin(false);
+                  setValue(1);
+                }}
                 color="primary"
                 variant=" contained"
                 fullWidth

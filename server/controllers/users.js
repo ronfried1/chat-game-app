@@ -2,8 +2,6 @@ import User from "../models/user.js";
 
 export const getUserByUserName = async (req, res) => {
   const { userName, userPassword } = req.body;
-  //add try catch
-  // User.findOne({ userName, userPassword }, (err, obj) => {
   User.findOne({ userName }, (err, obj) => {
     if (err) {
       res.status(404).json({ message: "can't log in" });

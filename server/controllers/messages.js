@@ -12,6 +12,7 @@ export const getMessagesBetween = async (user1, user2) => {
       .catch((err) => reject(err));
   });
 
+
   //add try catch
   // User.findOne({ userName, userPassword }, (err, obj) => {
   let results;

@@ -37,6 +37,7 @@ const messages = {
 io.on("connection", (socket) => {
   let currentUsername = null;
   console.log("connection");
+  console.log(LogedUsers);
 
   socket.on("join server", (username) => {
     currentUsername = username;
@@ -47,7 +48,6 @@ io.on("connection", (socket) => {
         user.socketId = socket.id;
       }
     });
-    console.log({ LogedUsers });
     io.emit("new user", LogedUsers);
   });
 
@@ -56,23 +56,25 @@ io.on("connection", (socket) => {
     cb(messagesBetween, roomName);
   });
 
-  socket.on("send message", async ({ messageContent, userReciver, userSender, createdAt }) => {
-    const payload = await createMessage(messageContent, userReciver, userSender,createdAt );
-    console.log({ payload });
-    const to = LogedUsers.find(u => u.userName === userReciver)
-    console.log(to.socketId, to);
-    socket.to(to.socketId).emit("new message", payload);
-
-    // if (messages[chatName]) {
-    //   messages[chatName].push({
-    //     sender,
-    //     content,
-    //   });
-    // }
-  });
+  socket.on(
+    "send message",
+    async ({ messageContent, userReciver, userSender, createdAt }) => {
+      const payload = await createMessage(
+        messageContent,
+        userReciver,
+        userSender,
+        createdAt
+      );
+      console.log({ payload });
+      const to = LogedUsers.find((u) => u.userName === userReciver);
+      const check = payload.createdAt;
+      const year = check.getFullYear();
+      console.log(typeof(check), "this from server");
+      socket.to(to.socketId).emit("new message", payload);
+    }
+  );
 
   socket.on("disconnect", () => {
-    //onlineUsers = onlineUsers.filter((u) => u.id !== socket.id);
     LogedUsers.forEach((user) => {
       if (user.socketId === socket.id) {
         user.isOnline = false;
@@ -100,14 +102,10 @@ mongoose
   })
   .then(() => getAllUsers())
   .then((users) => {
-    console.log({ users });
     users.forEach((user) => {
       user.isOnline = false;
       user.socketId = "";
     });
-    console.log({ users });
     LogedUsers = users;
   })
   .catch((error) => console.log(`${error} did not connect`));
-
-// app.listen(PORT, () => console.log(`Server Running on Port: http://localhost:${PORT}`))

@@ -6,23 +6,38 @@ export const SocketContext = React.createContext({
   //...
 });
 
-const initialMessagesState = {
-  // general: [],
-  // random: [],
-};
-
 export const SocketContextProvider = (props) => {
   const [username, setusername] = useState("");
   const [connected, setConnected] = useState(false);
   const [currentChat, setCurrentChat] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
-  const [messages, setMessages] = useState(initialMessagesState);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [offlineUsers, setOfflineUsers] = useState([]);
+  const [messages, setMessages] = useState({});
   const [message, setMessage] = useState("");
   const socketRef = useRef();
 
   useEffect(() => {
     setMessage("");
   }, [messages]);
+
+  useEffect(() => {
+    const online = allUsers.filter((user) => user.isOnline == true);
+    setOnlineUsers(online);
+    const offline = allUsers.filter((user) => user.isOnline == false);
+    setOfflineUsers(offline);
+  }, [allUsers]);
+
+  useEffect(() => {
+    const storedUserLoggedInInformation = localStorage.getItem("isLoggedIn");
+
+    if (storedUserLoggedInInformation === "1") {
+      setConnected(true);
+    }
+  }, []);
+
+
+
 
   function onUsernameChange(e) {
     setusername(e.target.value);
@@ -33,20 +48,24 @@ export const SocketContextProvider = (props) => {
   }
 
   function sendMessage() {
-    const payload = {
-      messageContent: message,
-      userReciver: currentChat,
-      userSender: username,
-      createdAt: new Date()
-    };
 
-    socketRef.current.emit("send message", payload);
-    //immer
-    const newMessages = immer(messages, (draft) => {
-      draft[currentChat].push(payload);
-    });
-    // const newMessages = [...messages, {sender: username, content: message}];
-    setMessages(newMessages);
+if(message.length != 0){
+
+  const payload = {
+    messageContent: message,
+    userReciver: currentChat,
+    userSender: username,
+    createdAt: new Date(),
+  };
+  
+  socketRef.current.emit("send message", payload);
+  payload.createdAt = payload.createdAt.toISOString();
+  
+  const newMessages = immer(messages, (draft) => {
+    draft[currentChat].push(payload);
+  });
+  setMessages(newMessages);
+}
   }
 
   function roomJoinCallback(incomingMessages, currentChat) {
@@ -63,10 +82,8 @@ export const SocketContextProvider = (props) => {
       });
       setMessages(newMessages);
 
-      socketRef.current.emit(
-        "join room",
-        currentChat,
-        (messages) => roomJoinCallback(messages, currentChat)
+      socketRef.current.emit("join room", currentChat, (messages) =>
+        roomJoinCallback(messages, currentChat)
       );
     }
 
@@ -78,10 +95,12 @@ export const SocketContextProvider = (props) => {
     setConnected(true);
     socketRef.current = io.connect("http://localhost:5000");
     socketRef.current.emit("join server", username);
+    localStorage.setItem("isLoggedIn", socketRef.current.id);
 
     //NO DATA RENDER
     socketRef.current.on("connect", () => {
       console.log("socket connected");
+      const sessionId = socketRef.current.id
     });
     socketRef.current.on("disconnect", () => {
       console.log("socket disconnect");
@@ -92,13 +111,16 @@ export const SocketContextProvider = (props) => {
 
     socketRef.current.on("new user", (allUsers) => {
       setAllUsers(allUsers);
-      console.log("new user", allUsers);
     });
     socketRef.current.on(
       "new message",
       ({ messageContent, userSender, userReciver, createdAt }) => {
+        console.log(
+          createdAt,
+          "this after sending and reciving ",
+          typeof createdAt
+        );
         setMessages((messages) => {
-          console.log(messages, "this is messages");
           const newMessages = immer(messages, (draft) => {
             if (draft[userSender]) {
               draft[userSender].push({ messageContent, userSender, createdAt });
@@ -111,6 +133,10 @@ export const SocketContextProvider = (props) => {
       }
     );
   }
+  function logOut(){
+    socketRef.current.emit("disconnect")
+  }
+
   return (
     <SocketContext.Provider
       value={{
@@ -122,6 +148,8 @@ export const SocketContextProvider = (props) => {
         yourId: socketRef.current ? socketRef.current.id : "",
         allUsers,
         currentChat,
+        onlineUsers,
+        offlineUsers,
         // -- funcs
         connect,
         onUsernameChange,
