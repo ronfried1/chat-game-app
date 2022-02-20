@@ -16,7 +16,6 @@ import {
   Typography,
 } from "@mui/material";
 import { createUser, loginUser } from "api";
-
 import { SocketContext } from "../context/socketContext";
 
 const userNameReducer = (state, action) => {
@@ -81,7 +80,7 @@ const Login = (props) => {
 
   const userNameChangeHandler = (event) => {
     dispatchUserName({ type: "USER_INPUT", val: event.target.value });
-    socket.onUsernameChange(event);
+    // socket.onUsernameChange(event);
   };
   const passwordChangeHandler = (event) => {
     dispatchPassword({ type: "USER_INPUT", val: event.target.value });
@@ -96,7 +95,7 @@ const Login = (props) => {
           userPassword: passwordState.value,
         }).then((user) => {
           if (user) {
-            socket.connect();     
+            socket.connect(user.data.user.userName);     
           }
         });
       } else {
@@ -105,7 +104,7 @@ const Login = (props) => {
           userPassword: passwordState.value,
         }).then((user) => {
           if (user) {
-            socket.connect();
+            socket.connect(user.userName);
           }
         });
       }

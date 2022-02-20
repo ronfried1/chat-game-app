@@ -40,9 +40,7 @@ export function getAllUsers() {
       .then((result) => {
         resolve(
           result.map((user) => ({
-            userName: user.userName,
-            userPassword: user.userPassword,
-            _id: user._id,
+            userName: user.userName
           }))
         );
       })

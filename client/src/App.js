@@ -32,21 +32,17 @@ const App = () => {
   const socket = useContext(SocketContext);
 
 
-  let body;
-  if (socket.connected) {
-    body = <Lobby />;
-  } else {
-    body = <Login />;
-  }
 
   return (
     <React.Fragment>
       <div className="App">
-        <Grid>
+        <Grid  sx={{ display: 'flex' }}>
         <AppNavBar  />
+        
           <Routes>
+            <Route path="/" element={socket.connected? <Lobby/>:<Login/>}/>
             <Route path="/Home" element={socket.connected? <Lobby/>:<Login/>} />
-            <Route path="/How to play" element={<HowToPlay/>} />
+            <Route path="/How%20to%20play" element={<HowToPlay/>} />
             <Route path="/About" element={<About/>} />
           </Routes>
         </Grid>

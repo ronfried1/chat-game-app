@@ -1,6 +1,7 @@
 import React, { Fragment, useContext, useEffect, useState } from "react";
 import {
   AppBar,
+  Badge,
   Box,
   Button,
   Collapse,
@@ -31,6 +32,7 @@ import {
   StarBorder,
 } from "@mui/icons-material";
 import Chat from "components/Chat";
+import UserList from "components/UserList";
 
 export default function Lobby(props) {
   const socket = useContext(SocketContext);
@@ -48,14 +50,9 @@ export default function Lobby(props) {
       return;
     }
     return (
-      <ListItemButton
-        key={user.userName}
-        sx={{ pl: 4 }}
-        onClick={() => socket.joinRoom(user.userName)}
-      >
-        <ListItemText primary={user.userName + " "} />
-      </ListItemButton>
+   <UserList userName ={user.userName}/>
     );
+    
   }
   const handleOnlineClick = () => {
     setOnlineOpen(!onlineOpen);
@@ -123,6 +120,7 @@ export default function Lobby(props) {
         id="paper"
         elevation={5}
       >
+        <Toolbar />
         <Chat />
       </Paper>
     </Box>

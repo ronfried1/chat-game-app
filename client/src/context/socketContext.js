@@ -16,22 +16,24 @@ export const SocketContextProvider = (props) => {
   const [messages, setMessages] = useState({});
   const [message, setMessage] = useState("");
   const socketRef = useRef();
+  const [newMessageForUser, setnewMessageForUser] = useState("")
 
   useEffect(() => {
     setMessage("");
   }, [messages]);
 
   useEffect(() => {
-    const online = allUsers.filter((user) => user.isOnline == true);
+    const online = allUsers.filter((user) => user.isOnline === true);
     setOnlineUsers(online);
-    const offline = allUsers.filter((user) => user.isOnline == false);
+    const offline = allUsers.filter((user) => user.isOnline === false);
     setOfflineUsers(offline);
   }, [allUsers]);
 
   useEffect(() => {
-    const storedUserLoggedInInformation = localStorage.getItem("isLoggedIn");
+    const storedUserLoggedInInfo = localStorage.getItem("isLoggedIn");
 
-    if (storedUserLoggedInInformation === "1") {
+    if (storedUserLoggedInInfo) {
+      setusername(storedUserLoggedInInfo)
       setConnected(true);
     }
   }, []);
@@ -39,9 +41,9 @@ export const SocketContextProvider = (props) => {
 
 
 
-  function onUsernameChange(e) {
-    setusername(e.target.value);
-  }
+  // function onUsernameChange(e) {
+  //   setusername(e.target.value);
+  // }
 
   function handleMessageChange(e) {
     setMessage(e.target.value);
@@ -90,17 +92,19 @@ if(message.length != 0){
     setCurrentChat(currentChat);
   }
 
-  function connect() {
+  function connect(usernamefrom) {
+    if(usernamefrom){
+      setusername(usernamefrom)
+    }
     console.log("connecting");
     setConnected(true);
     socketRef.current = io.connect("http://localhost:5000");
     socketRef.current.emit("join server", username);
-    localStorage.setItem("isLoggedIn", socketRef.current.id);
+    localStorage.setItem("isLoggedIn",username);
 
     //NO DATA RENDER
     socketRef.current.on("connect", () => {
       console.log("socket connected");
-      const sessionId = socketRef.current.id
     });
     socketRef.current.on("disconnect", () => {
       console.log("socket disconnect");
@@ -115,11 +119,9 @@ if(message.length != 0){
     socketRef.current.on(
       "new message",
       ({ messageContent, userSender, userReciver, createdAt }) => {
-        console.log(
-          createdAt,
-          "this after sending and reciving ",
-          typeof createdAt
-        );
+        if(username == userReciver){
+          setnewMessageForUser(userSender)
+        }
         setMessages((messages) => {
           const newMessages = immer(messages, (draft) => {
             if (draft[userSender]) {
@@ -134,7 +136,14 @@ if(message.length != 0){
     );
   }
   function logOut(){
+    setusername("");
+    localStorage.removeItem("isLoggedIn")
+    setConnected(false);
+    window.location.reload(false)
     socketRef.current.emit("disconnect")
+  }
+  function onBadgeChange(){
+  setnewMessageForUser("")
   }
 
   return (
@@ -144,6 +153,7 @@ if(message.length != 0){
         connected,
         username,
         message,
+        newMessageForUser,
         messages,
         yourId: socketRef.current ? socketRef.current.id : "",
         allUsers,
@@ -152,10 +162,11 @@ if(message.length != 0){
         offlineUsers,
         // -- funcs
         connect,
-        onUsernameChange,
+        logOut,
         handleMessageChange,
         sendMessage,
         joinRoom,
+        onBadgeChange,
       }}
     >
       {props.children}

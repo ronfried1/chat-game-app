@@ -42,12 +42,33 @@ io.on("connection", (socket) => {
   socket.on("join server", (username) => {
     currentUsername = username;
     console.log("join server : ", username);
-    LogedUsers.forEach((user) => {
-      if (user.userName === username) {
-        user.isOnline = true;
-        user.socketId = socket.id;
-      }
-    });
+    // getAllUsers().then((users) => {
+    //   users.forEach((user) => {
+    //     user.isOnline = false;
+    //     user.socketId = "";
+    //   });
+    //   LogedUsers = users;
+    // });
+
+    const pickedUser = LogedUsers.filter((u) => u.userName === currentUsername);
+    console.log(pickedUser);
+    if (pickedUser.userName !== null) {
+      LogedUsers.forEach((user) => {
+        if (user.userName === username) {
+          user.isOnline = true;
+          user.socketId = socket.id;
+        }
+      });
+      console.log("its from the right place");
+    } else {
+      LogedUsers.push({
+        userName: currentUsername,
+        isOnline: true,
+        socketId: socket.id,
+      });
+    }
+
+    console.log(LogedUsers);
     io.emit("new user", LogedUsers);
   });
 
@@ -69,7 +90,7 @@ io.on("connection", (socket) => {
       const to = LogedUsers.find((u) => u.userName === userReciver);
       const check = payload.createdAt;
       const year = check.getFullYear();
-      console.log(typeof(check), "this from server");
+      console.log(typeof check, "this from server");
       socket.to(to.socketId).emit("new message", payload);
     }
   );
@@ -107,5 +128,6 @@ mongoose
       user.socketId = "";
     });
     LogedUsers = users;
+    console.log(LogedUsers);
   })
   .catch((error) => console.log(`${error} did not connect`));

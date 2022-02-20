@@ -12,11 +12,14 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { Link } from "react-router-dom";
+import SocketContext from "context/socketContext";
 
-const pages = ["home", "howtoplay", "about"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const pages = ["home", "how to play", "about"];
+//"Profile", "Account", "Dashboard",
+const settings = ["Logout"];
 
 const AppNavBar = () => {
+  const socket = React.useContext(SocketContext);
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -33,10 +36,14 @@ const AppNavBar = () => {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+
   };
 
   return (
-    <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+    <AppBar
+      position="fixed"
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
@@ -101,7 +108,12 @@ const AppNavBar = () => {
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: "white", display: "block" }}
               >
-                <Link style={{textDecoration: "none", color: "white"}} to={`/${page}`}>{page}</Link>
+                <Link
+                  style={{ textDecoration: "none", color: "white" }}
+                  to={`/${page}`}
+                >
+                  {page}
+                </Link>
               </Button>
             ))}
           </Box>
@@ -109,7 +121,11 @@ const AppNavBar = () => {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar
+                  sx={{ bgcolor: socket.connected ? "lightBlue" : "grey" }}
+                  alt={socket.username.toUpperCase()}
+                  src="/"
+                />
               </IconButton>
             </Tooltip>
             <Menu
@@ -128,11 +144,15 @@ const AppNavBar = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
+              <MenuItem key={settings[0]} onClick={handleCloseUserMenu}>
+                <Button textAlign="center" onClick={()=> socket.logOut()}>{settings[0]}</Button>
+              </MenuItem>
+            
+              {/* {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
-              ))}
+              ))} */}
             </Menu>
           </Box>
         </Toolbar>

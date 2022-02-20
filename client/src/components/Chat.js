@@ -59,7 +59,7 @@ export default function Chat(props) {
     <Box id="box" p={3}>
       <Toolbar>{socket.currentChat || "no chat"}</Toolbar>
       <Divider />
-      <Grid container spacing={4} alignItems="center">
+      {socket.currentChat &&  <Grid container spacing={4} alignItems="center">
         <Grid xs={12} item>
           {body}{" "}
         </Grid>
@@ -85,7 +85,7 @@ export default function Chat(props) {
             <SendIcon />
           </IconButton>
         </Grid>
-      </Grid>
+      </Grid>}
     </Box>
   );
 }
