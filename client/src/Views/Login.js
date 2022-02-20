@@ -8,12 +8,10 @@ import React, {
 import {
   Button,
   Grid,
-  Input,
   Paper,
   Tab,
   Tabs,
   TextField,
-  Typography,
 } from "@mui/material";
 import { createUser, loginUser } from "api";
 import { SocketContext } from "../context/socketContext";
@@ -80,7 +78,6 @@ const Login = (props) => {
 
   const userNameChangeHandler = (event) => {
     dispatchUserName({ type: "USER_INPUT", val: event.target.value });
-    // socket.onUsernameChange(event);
   };
   const passwordChangeHandler = (event) => {
     dispatchPassword({ type: "USER_INPUT", val: event.target.value });

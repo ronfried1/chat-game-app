@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import SocketContext from "context/socketContext";
-import { Badge, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { Badge, ListItemButton, ListItemText } from "@mui/material";
 
 export default function UserList(props) {
   const socket = useContext(SocketContext);
@@ -11,7 +11,6 @@ export default function UserList(props) {
         setCount(count + 1);
         socket.onBadgeChange();
     }
-
   }, [socket.newMessageForUser])
   
 

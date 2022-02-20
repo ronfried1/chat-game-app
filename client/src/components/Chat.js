@@ -1,13 +1,8 @@
-import React, { Fragment, useContext, useEffect, useState } from "react";
+import React, {  useContext, useState } from "react";
 import {
-    AppBar,
     Box,
-    Button,
-    Collapse,
-    Container,
     CssBaseline,
     Divider,
-    Drawer,
     FormControl,
     Grid,
     IconButton,
@@ -23,9 +18,6 @@ import SocketContext from "context/socketContext";
 
 export default function Chat(props) {
   const socket = useContext(SocketContext);
-
-
-
   const renderMessages = (message, index) => {
     const time = moment(message.createdAt).format("hh:mm");
     const date = moment(message.createdAt).format("MMM Do YY");

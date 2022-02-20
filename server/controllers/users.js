@@ -47,19 +47,3 @@ export function getAllUsers() {
       .catch((err) => reject(err));
   });
 }
-
-// export const getAllUsers = async () => {
-//   try {
-//     const results = await User.find({});
-//     const allUsers = results.map((user) => {
-//       {
-//         user.userName;
-//       }
-//     });
-
-//     return allUsers;
-//   } catch (error) {
-//     console.log(error);
-//     return null;
-//   }
-// };

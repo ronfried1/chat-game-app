@@ -1,35 +1,22 @@
 import React, { Fragment, useContext, useEffect, useState } from "react";
 import {
-  AppBar,
-  Badge,
   Box,
-  Button,
   Collapse,
-  Container,
   CssBaseline,
   Divider,
   Drawer,
-  FormControl,
-  Grid,
-  IconButton,
   List,
-  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  ListSubheader,
   Paper,
-  TextField,
   Toolbar,
-  Typography,
 } from "@mui/material";
 import SocketContext from "../context/socketContext";
 import {
   CircleOutlined,
   ExpandLess,
   ExpandMore,
-  InboxOutlined,
-  StarBorder,
 } from "@mui/icons-material";
 import Chat from "components/Chat";
 import UserList from "components/UserList";
@@ -113,7 +100,6 @@ export default function Lobby(props) {
           </Collapse>
         </List>
       </Drawer>
-
       <Paper
         component="main"
         sx={{ flexGrow: 1, p: 3, margin: 20 }}

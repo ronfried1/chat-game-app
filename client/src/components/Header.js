@@ -13,6 +13,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { Link } from "react-router-dom";
 import SocketContext from "context/socketContext";
+import CasinoIcon from '@mui/icons-material/Casino';
 
 const pages = ["home", "how to play", "about"];
 //"Profile", "Account", "Dashboard",
@@ -46,15 +47,7 @@ const AppNavBar = () => {
     >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ mr: 2, display: { xs: "none", md: "flex" } }}
-          >
-            LOGO
-          </Typography>
-
+  <CasinoIcon/>
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
@@ -145,7 +138,7 @@ const AppNavBar = () => {
               onClose={handleCloseUserMenu}
             >
               <MenuItem key={settings[0]} onClick={handleCloseUserMenu}>
-                <Button textAlign="center" onClick={()=> socket.logOut()}>{settings[0]}</Button>
+                <Button disabled={!socket.connected? "disabled": ""} textAlign="center" onClick={()=> socket.logOut()}>{settings[0]}</Button>
               </MenuItem>
             
               {/* {settings.map((setting) => (

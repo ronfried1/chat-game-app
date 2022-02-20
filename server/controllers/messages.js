@@ -12,9 +12,6 @@ export const getMessagesBetween = async (user1, user2) => {
       .catch((err) => reject(err));
   });
 
-
-  //add try catch
-  // User.findOne({ userName, userPassword }, (err, obj) => {
   let results;
 
   Message.find({
@@ -40,18 +37,3 @@ export const createMessage = async (content, to, sender, time) => {
     console.log("didn't save");
   }
 };
-//   Message.find({ userSender: user1, userReciver: user2 }).then((res1) => {
-//     results.push(res1);
-//     Message.find({ userSender: user2, userReciver: user1 }).then((res2) => {
-//       results.push(res2);
-//     });
-//   });
-//   const MessageSchema = mongoose.Schema({
-//     messageContent: { String, required: true },
-//     userSender: string,
-//     userReciver: string,
-//     createdAt: {
-//       type: Date,
-//       default: new Date(),
-//     },
-//   });

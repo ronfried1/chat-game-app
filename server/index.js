@@ -2,11 +2,9 @@ import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
-// const http = require('http');
 import http from "http";
 const app = express();
 const server = http.createServer(app);
-// const { Server } = require("socket.io");
 import { Server } from "socket.io";
 const io = new Server(server, {
   cors: {
@@ -41,14 +39,6 @@ io.on("connection", (socket) => {
 
   socket.on("join server", (username) => {
     currentUsername = username;
-    console.log("join server : ", username);
-    // getAllUsers().then((users) => {
-    //   users.forEach((user) => {
-    //     user.isOnline = false;
-    //     user.socketId = "";
-    //   });
-    //   LogedUsers = users;
-    // });
 
     const pickedUser = LogedUsers.filter((u) => u.userName === currentUsername);
     console.log(pickedUser);
@@ -86,11 +76,7 @@ io.on("connection", (socket) => {
         userSender,
         createdAt
       );
-      console.log({ payload });
       const to = LogedUsers.find((u) => u.userName === userReciver);
-      const check = payload.createdAt;
-      const year = check.getFullYear();
-      console.log(typeof check, "this from server");
       socket.to(to.socketId).emit("new message", payload);
     }
   );
@@ -128,6 +114,5 @@ mongoose
       user.socketId = "";
     });
     LogedUsers = users;
-    console.log(LogedUsers);
   })
   .catch((error) => console.log(`${error} did not connect`));

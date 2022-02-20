@@ -31,19 +31,11 @@ export const SocketContextProvider = (props) => {
 
   useEffect(() => {
     const storedUserLoggedInInfo = localStorage.getItem("isLoggedIn");
-
     if (storedUserLoggedInInfo) {
       setusername(storedUserLoggedInInfo)
       setConnected(true);
     }
   }, []);
-
-
-
-
-  // function onUsernameChange(e) {
-  //   setusername(e.target.value);
-  // }
 
   function handleMessageChange(e) {
     setMessage(e.target.value);
