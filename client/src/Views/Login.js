@@ -111,7 +111,6 @@ const Login = (props) => {
   const paperStyle = {
     padding: 20,
     paddinTop: 0,
-    height: "70vh",
     width: 280,
     margin: "20px auto",
   };
@@ -160,29 +159,31 @@ const Login = (props) => {
               fullWidth
               required
             />
-            {signin && (
-              <Button
-                type="submit"
-                color="primary"
-                variant=" contained"
-                fullWidth
-              >
-                Log in
-              </Button>
-            )}
-            {signin && (
-              <Button
-                onClick={() => {
-                  setSignin(false);
-                  setValue(1);
-                }}
-                color="primary"
-                variant=" contained"
-                fullWidth
-              >
-                Create New account
-              </Button>
-            )}
+            <div style={{ marginTop: "3rem" }}>
+              {signin && (
+                <Button
+                  type="submit"
+                  color="primary"
+                  variant=" contained"
+                  fullWidth
+                >
+                  Log in
+                </Button>
+              )}
+              {signin && (
+                <Button
+                  onClick={() => {
+                    setSignin(false);
+                    setValue(1);
+                  }}
+                  color="primary"
+                  variant=" contained"
+                  fullWidth
+                >
+                  Create New account
+                </Button>
+              )}
+            </div>
             {!signin && (
               <Button
                 type="submit"
