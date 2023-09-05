@@ -3,17 +3,18 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
 import http from "http";
+import dotenv from "dotenv";
+import { Server } from "socket.io";
+
 const app = express();
 const server = http.createServer(app);
-import { Server } from "socket.io";
 const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
   },
 });
-
-// require ('dotenv/config');
+dotenv.config();
 
 // IMPORT ROUTES
 
@@ -94,11 +95,8 @@ io.on("connection", (socket) => {
 
 app.use("/users", userRoutes);
 
-//CONNECT TO DB
-const CONNECTION_URL =
-  "mongodb+srv://ron1:ron1@gamecluster.h8l60.mongodb.net/gamecluster?retryWrites=true&w=majority";
 const PORT = process.env.PORT || 5000;
-
+const CONNECTION_URL = process.env.CONNECTION_URL;
 mongoose
   .connect(CONNECTION_URL)
   .then(() => console.log("conected to DB"))

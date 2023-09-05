@@ -1,4 +1,5 @@
 {
+  "homepage": "https://ronfried1.github.io/chat-game-app",
   "name": "game-app",
   "version": "0.1.0",
   "private": true,
@@ -32,7 +33,9 @@
     "start": " react-scripts --openssl-legacy-provider  start",
     "build": "react-scripts --openssl-legacy-provider build",
     "test": " node --openssl-legacy-provider react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
